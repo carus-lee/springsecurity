@@ -28,14 +28,6 @@ public class AjaxAuthenticationProvider implements AuthenticationProvider {
             throw new BadCredentialsException("Invalid Password");
         }
 
-        //아이디/비번 외 파라미터를 받아서 인증 체크 추가 (필요에 따라 사용 - 필수X)
-        //ajax로 로그인시 부가정보 생략
-//        FormWebAuthenticationDetailSource details = (FormWebAuthenticationDetailSource)authentication.getDetails();
-//        String secretKey = details.getSecretKey();
-//        if (secretKey == null || !"secret".equals(secretKey)) {
-//            throw new InsufficientAuthenticationException("InsufficientAuthenticationException");
-//        }
-
         AjaxAuthenticationToken authenticationToken =
                 new AjaxAuthenticationToken(accountContext.getAccount(), null, accountContext.getAuthorities());
 
