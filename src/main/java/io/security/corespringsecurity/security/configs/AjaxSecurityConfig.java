@@ -48,30 +48,43 @@ public class AjaxSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatcher("/api/**") //해당URI로 요청시에만 이 설정을 따름
                 .authorizeRequests()
                 .antMatchers("/api/messages").hasRole("MANAGER")
+                .antMatchers("/api/login").permitAll()
                 .anyRequest().authenticated();
-        http
-                .addFilterBefore(ajaxLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class); //인증필터
         http
                 .exceptionHandling()
                     .authenticationEntryPoint(new AjaxLoginAuthenticationEntryPoint())
                     .accessDeniedHandler(ajaxAccessDeniedHandler());
+//        http
+//                .addFilterBefore(ajaxLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class); //인증필터
 
         http.csrf().disable();
+
+        customConfigureAjax(http);
+    }
+
+    private void customConfigureAjax(HttpSecurity http) throws Exception {
+        http
+                .apply(new AjaxLoginConfigure<>())
+                .successHandlerAjax(ajaxAuthenticationSuccessHandler())
+                .failerHandlerAjax(ajaxAuthenticationFailerHandler())
+                .setAuthenticationManager(authenticationManagerBean())
+                .loginProcessingUrl("/api/login")
+        ;
     }
 
     public AccessDeniedHandler ajaxAccessDeniedHandler() {
         return new AjaxAccessDeniedHandler();
     }
 
-    @Bean
-    public AjaxLoginProcessingFilter ajaxLoginProcessingFilter() throws Exception {
-        AjaxLoginProcessingFilter ajaxLoginProcessingFilter = new AjaxLoginProcessingFilter();
-        ajaxLoginProcessingFilter.setAuthenticationManager(authenticationManagerBean());
-        // 필터에 인증성공/실패 핸들러 등록
-        ajaxLoginProcessingFilter.setAuthenticationSuccessHandler(ajaxAuthenticationSuccessHandler());
-        ajaxLoginProcessingFilter.setAuthenticationFailureHandler(ajaxAuthenticationFailerHandler());
-
-        return ajaxLoginProcessingFilter;
-    }
+//    @Bean
+//    public AjaxLoginProcessingFilter ajaxLoginProcessingFilter() throws Exception {
+//        AjaxLoginProcessingFilter ajaxLoginProcessingFilter = new AjaxLoginProcessingFilter();
+//        ajaxLoginProcessingFilter.setAuthenticationManager(authenticationManagerBean());
+//        // 필터에 인증성공/실패 핸들러 등록
+//        ajaxLoginProcessingFilter.setAuthenticationSuccessHandler(ajaxAuthenticationSuccessHandler());
+//        ajaxLoginProcessingFilter.setAuthenticationFailureHandler(ajaxAuthenticationFailerHandler());
+//
+//        return ajaxLoginProcessingFilter;
+//    }
 
 }
