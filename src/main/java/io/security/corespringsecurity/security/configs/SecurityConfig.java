@@ -14,8 +14,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDecisionVoter;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.access.vote.AffirmativeBased;
-import org.springframework.security.access.vote.RoleVoter;
+import org.springframework.security.access.vote.RoleHierarchyVoter;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -34,7 +35,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
@@ -131,10 +132,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     private List<AccessDecisionVoter<?>> getAccessDecisionVoter() {
-//        List<AccessDecisionVoter<?>> accessDecisionVoters = new ArrayList<>();
-//        accessDecisionVoters.add(roleHirackeyVotor());
-//        return accessDecisionVoters;
-        return Arrays.asList(new RoleVoter());
+        List<AccessDecisionVoter<? extends Object>> accessDecisionVoters = new ArrayList<>();
+        accessDecisionVoters.add(roleHirackeyVotor());
+//        accessDecisionVoters.add((new RoleVoter()));
+        return accessDecisionVoters;
+//        return Arrays.asList(new RoleVoter());
+    }
+
+    @Bean
+    public AccessDecisionVoter<? extends Object> roleHirackeyVotor() {
+        return new RoleHierarchyVoter(roleHirackey());
+    }
+
+    @Bean
+    public RoleHierarchyImpl roleHirackey() {
+        return new RoleHierarchyImpl();
     }
 
     @Bean
@@ -149,22 +161,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return urlResourcesMapFactoryBean;
     }
 
-
 //    @Bean
 //    public AjaxLoginProcessingFilter ajaxLoginProcessingFilter() throws Exception {
 //        AjaxLoginProcessingFilter ajaxLoginProcessingFilter = new AjaxLoginProcessingFilter();
 //        ajaxLoginProcessingFilter.setAuthenticationManager(authenticationManagerBean());
 //        return ajaxLoginProcessingFilter;
-//    }
 
-//    @Bean
-//    public AccessDecisionVoter<? extends Object> roleHirackeyVotor() {
-//        return new RoleHierarchyVoter(roleHirackey());
-//    }
-
-//    @Bean
-//    public RoleHierarchyImpl roleHirackey() {
-//        return new RoleHierarchyImpl();
 //    }
 
 }
