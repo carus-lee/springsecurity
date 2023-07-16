@@ -1,6 +1,7 @@
 package io.security.corespringsecurity.security.configs;
 
 import io.security.corespringsecurity.security.factory.UrlResourcesMapFactoryBean;
+import io.security.corespringsecurity.security.filter.PermitAllFilter;
 import io.security.corespringsecurity.security.handler.CustomAccessDeniedHandler;
 import io.security.corespringsecurity.security.metadatasource.UrlFilterInvocationSecurityMetadataSource;
 import io.security.corespringsecurity.security.provider.CustomAuthenticationProvider;
@@ -76,7 +77,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(final HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                    .antMatchers(permitAllResources).permitAll()
                     .anyRequest().authenticated();
         http
                 .formLogin()
@@ -118,7 +118,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public FilterSecurityInterceptor customFilterSecurityInterceptor() throws Exception {
-        FilterSecurityInterceptor filterSecurityInterceptor = new FilterSecurityInterceptor();
+        PermitAllFilter filterSecurityInterceptor = new PermitAllFilter(permitAllResources);
         filterSecurityInterceptor.setSecurityMetadataSource(urlFilterInvocationSecurityMetadataSource());
         filterSecurityInterceptor.setAccessDecisionManager(affirmativeBased());
         filterSecurityInterceptor.setAuthenticationManager(authenticationManagerBean());
